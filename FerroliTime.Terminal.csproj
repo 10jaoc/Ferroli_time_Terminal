@@ -13,5 +13,7 @@
   <ItemGroup>
     <!-- La plantilla de configuración es para el repositorio, no para el servidor. -->
     <Content Update="appsettings.example.json" CopyToPublishDirectory="Never" />
+    <!-- El appsettings.json del servidor (contraseñas de producción) no se sobrescribe al publicar. -->
+    <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 </Project>
