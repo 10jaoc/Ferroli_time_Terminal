@@ -9,8 +9,9 @@
 
   var pintar = function () {
     var d = new Date(Date.now() + (isNaN(desfase) ? 0 : desfase));
-    hora.textContent = dos(d.getHours()) + ':' + dos(d.getMinutes()) + ':' + dos(d.getSeconds());
-    fecha.textContent = dos(d.getDate()) + '/' + dos(d.getMonth() + 1) + '/' + d.getFullYear();
+    // Getters UTC: el valor ya es la hora de pared del servidor, sin zona del equipo.
+    hora.textContent = dos(d.getUTCHours()) + ':' + dos(d.getUTCMinutes()) + ':' + dos(d.getUTCSeconds());
+    fecha.textContent = dos(d.getUTCDate()) + '/' + dos(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear();
   };
   pintar();
   setInterval(pintar, 1000);
