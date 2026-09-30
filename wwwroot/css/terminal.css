@@ -1,0 +1,124 @@
+/* Terminal de marcajes · mismos colores que el backoffice, pensado para pantalla táctil y móvil. */
+
+:root {
+  --azul-oscuro: #17365d;
+  --azul-claro: #f6f9fc;
+  --gris-borde: #d7dee5;
+  --texto: #22303c;
+  --error: #b3261e;
+  --exito: #1e6b3a;
+  --aviso-fondo: #fff2cc;
+  --entrada: #1e6b3a;
+  --salida: #b3261e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--texto);
+  background: var(--azul-claro);
+  overflow-x: hidden;
+}
+
+.app-header {
+  background: var(--azul-oscuro);
+  color: #fff;
+  padding: .75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+}
+.marca { display: flex; align-items: center; gap: .75rem; font-weight: 600; font-size: 1.1rem; }
+.app-logo { height: 2rem; }
+.reloj { display: flex; align-items: baseline; gap: .75rem; font-variant-numeric: tabular-nums; }
+.reloj .hora { font-size: 1.6rem; font-weight: 700; }
+.reloj .fecha { opacity: .85; }
+
+main { max-width: 720px; margin: 0 auto; padding: 1.5rem 16px; }
+
+h1, h2 { color: var(--azul-oscuro); }
+h1 { margin-top: 0; font-size: 1.4rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; }
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--gris-borde);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(23, 54, 93, .08);
+}
+.panel.cerrado { text-align: center; padding: 2.5rem 1.5rem; }
+.panel.cerrado h1 { font-size: 1.8rem; color: var(--error); }
+.detalle { color: #5a6b7b; }
+
+label { display: block; font-weight: 600; margin-bottom: .4rem; }
+input {
+  width: 100%;
+  padding: .75rem;
+  font-size: 1.6rem;
+  letter-spacing: .15em;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+}
+input:focus { outline: 3px solid rgba(23, 54, 93, .25); border-color: var(--azul-oscuro); }
+
+button, .boton {
+  display: inline-block;
+  background: var(--azul-oscuro);
+  color: #fff;
+  border: 1px solid var(--azul-oscuro);
+  border-radius: 6px;
+  padding: .7rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+button.secundario, .boton.secundario { background: #fff; color: var(--azul-oscuro); }
+button:hover, .boton:hover { opacity: .9; }
+
+.form-codigo { display: grid; gap: .9rem; }
+.form-codigo button { font-size: 1.2rem; padding: .9rem; }
+
+.empleado { text-align: center; margin-bottom: 1.25rem; }
+.empleado .codigo { color: #5a6b7b; font-variant-numeric: tabular-nums; }
+.empleado .nombre { font-size: 1.5rem; font-weight: 700; color: var(--azul-oscuro); }
+
+.boton-fichar {
+  display: block;
+  width: 100%;
+  font-size: 2.2rem;
+  letter-spacing: .1em;
+  padding: 1.4rem;
+  border-radius: 10px;
+}
+.boton-fichar.entrada { background: var(--entrada); border-color: var(--entrada); }
+.boton-fichar.salida { background: var(--salida); border-color: var(--salida); }
+.otro-empleado { display: block; margin-top: .9rem; }
+
+table { width: 100%; border-collapse: collapse; margin: .5rem 0; }
+th, td { border: 1px solid var(--gris-borde); padding: .5rem .65rem; text-align: left; font-size: .95rem; }
+th { background: var(--azul-oscuro); color: #fff; }
+tr:nth-child(even) td { background: var(--azul-claro); }
+.tipo { font-weight: 700; }
+.tipo.entrada { color: var(--entrada); }
+.tipo.salida { color: var(--salida); }
+
+.alerta { padding: .8rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+.alerta.error { background: #fde8e6; color: var(--error); border: 1px solid var(--error); }
+.alerta.exito { background: #e6f4ea; color: var(--exito); border: 1px solid var(--exito); }
+.alerta.aviso { background: var(--aviso-fondo); color: #5c4b00; border: 1px solid #d8b400; }
+.mensaje-fichaje { font-size: 1.15rem; font-weight: 600; text-align: center; }
+
+@media (max-width: 640px) {
+  .app-header { padding: .6rem 16px; }
+  .reloj .hora { font-size: 1.3rem; }
+  .panel { padding: 1rem; }
+  .boton-fichar { font-size: 1.8rem; padding: 1.1rem; }
+  th, td { font-size: .85rem; padding: .4rem; }
+}

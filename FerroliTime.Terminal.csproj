@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FerroliTime.Terminal</RootNamespace>
+    <AssemblyName>FerroliTime.Terminal</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- La plantilla de configuración es para el repositorio, no para el servidor. -->
+    <Content Update="appsettings.example.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+</Project>

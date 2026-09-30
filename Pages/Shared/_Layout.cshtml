@@ -1,0 +1,32 @@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuracion
+@{
+  var nombreApp = Configuracion["App:Nombre"] ?? "Ferroli Time";
+  // Hora del servidor (la que se graba): el reloj de la cabecera la toma como referencia.
+  var servidorMs = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@(ViewData["Title"] != null ? ViewData["Title"] + " · " + nombreApp : nombreApp)</title>
+  <link rel="icon" type="image/png" href="~/images/F_Main_favicon%201.png" />
+  <link rel="stylesheet" href="~/css/terminal.css" asp-append-version="true" />
+</head>
+<body>
+<header class="app-header">
+  <div class="marca">
+    <img src="~/images/ferroli-logo-b.png" alt="Ferroli" class="app-logo" />
+    <span>@nombreApp</span>
+  </div>
+  <div class="reloj" id="reloj" data-servidor="@servidorMs">
+    <span class="hora"></span>
+    <span class="fecha"></span>
+  </div>
+</header>
+<main>
+  @RenderBody()
+</main>
+<script src="~/js/terminal.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+@page
+@model IndexModel
+@using FerroliTime.Terminal.Services
+@{ ViewData["Title"] = "Marcajes"; }
+
+@if (TempData["Mensaje"] is string mensaje)
+{
+  <div class="alerta @((TempData["MensajeOk"] as bool?) == true ? "exito" : "aviso") mensaje-fichaje" data-ocultar="6">@mensaje</div>
+}
+
+@if (Model.Terminal.Tipo == TipoTerminal.NoAutorizado)
+{
+  <div class="panel cerrado">
+    <h1>Terminal no autorizado</h1>
+    <p>Este equipo no está dado de alta para fichar.</p>
+    <p class="detalle">IP: <strong>@(string.IsNullOrEmpty(Model.Terminal.Ip) ? "desconocida" : Model.Terminal.Ip)</strong></p>
+    <p class="detalle">Si debería poder fichar desde aquí, comunique esta IP al administrador.</p>
+  </div>
+  return;
+}
+
+@if (!Model.Abierto)
+{
+  <div class="panel cerrado">
+    <h1>Sistema cerrado</h1>
+    <p>No se pueden realizar marcajes.</p>
+    <p class="detalle">@Model.MotivoCerrado</p>
+    <p class="detalle">@Model.Ahora.ToString("dd/MM/yyyy HH:mm:ss")</p>
+  </div>
+  return;
+}
+
+<div class="panel">
+  <h1>Introducción de marcajes</h1>
+
+  @if (!string.IsNullOrEmpty(Model.Error))
+  {
+    <div class="alerta error">@Model.Error</div>
+  }
+
+  @if (Model.Empleado is null)
+  {
+    @* PC común: pedir nº de empleado *@
+    <form method="post" asp-page-handler="Identificar" class="form-codigo">
+      <label for="codigo">Nº de empleado</label>
+      <input id="codigo" name="codigo" value="@Model.CodigoTecleado" inputmode="numeric" maxlength="8"
+             autocomplete="off" autofocus required />
+      <button type="submit">Continuar</button>
+    </form>
+  }
+  else
+  {
+    <div class="empleado">
+      <div class="codigo">@Model.Empleado.MP_CODI</div>
+      <div class="nombre">@Model.Empleado.Descripcion</div>
+    </div>
+
+    <form method="post" asp-page-handler="Fichar" class="form-fichar"
+          data-volver="@Model.SegundosInactividad">
+      <input type="hidden" name="codigo" value="@Model.Empleado.MP_CODI" />
+      <button type="submit" class="boton-fichar @(Model.TocaEntrada ? "entrada" : "salida")" autofocus>
+        @(Model.TocaEntrada ? "ENTRADA" : "SALIDA")
+      </button>
+    </form>
+
+    @if (Model.Terminal.Tipo == TipoTerminal.PcComun)
+    {
+      <a asp-page="/Index" class="boton secundario otro-empleado">Otro nº de empleado</a>
+    }
+
+    <h2>Marcajes de hoy</h2>
+    @if (Model.Marcajes.Count == 0)
+    {
+      <p class="detalle">Todavía no hay marcajes hoy.</p>
+    }
+    else
+    {
+      <table>
+        <thead><tr><th>Hora</th><th>Tipo</th><th>Localización</th></tr></thead>
+        <tbody>
+          @foreach (var m in Model.Marcajes)
+          {
+            <tr>
+              <td>@m.HoraTexto</td>
+              <td><span class="tipo @(m.ENTRADA == 0 ? "entrada" : "salida")">@m.Tipo</span></td>
+              <td>@m.DESC_LOCA</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

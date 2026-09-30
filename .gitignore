@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Configuración con contraseñas (plantilla: appsettings.example.json)
+appsettings.json
