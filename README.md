@@ -10,7 +10,7 @@ Solo se puede fichar desde los equipos cuya IP está dada de alta (desde el back
 
 | Dónde está la IP | Tipo | Cómo se ficha |
 |---|---|---|
-| Parámetros **500 a 510** (`CMSParametros.ValorAlfanumerico`) | PC común | Se teclea el nº de empleado. Solo empleados activos con **reloj 99**. |
+| Parámetros **activos 500 a 599** (`CMSParametros.ValorAlfanumerico`) | PC común | Se teclea el nº de empleado. Solo empleados activos con **reloj 99**. |
 | **Terminales/Empleados** (`telefonos_aut.Id_telefono`) | Terminal personal | El empleado es el de esa IP; no se teclea nada. |
 
 Cualquier otra IP ve «Terminal no autorizado» (HTTP 403) con su IP, para comunicarla al administrador.
@@ -57,7 +57,7 @@ dotnet run          # http://localhost:5081
 ```
 
 Desde el propio PC la IP es `127.0.0.1` (no autorizada): para probar, pon en `Terminal:IpSimulada` una IP de
-`telefonos_aut` o de los parámetros 500–510.
+`telefonos_aut` o de los parámetros 500–599.
 
 Publicación para IIS: `Publicar.cmd` (genera `bin\publish`; el servidor necesita el ASP.NET Core 8 Hosting
 Bundle). En el backoffice, **Configuración → URL del terminal** activa el menú «Emular terminal».

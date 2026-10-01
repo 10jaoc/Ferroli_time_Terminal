@@ -22,22 +22,26 @@ public class TerminalRepository(string connStr)
 {
     private SqlConnection Conexion() => new(connStr);
 
-    /// <summary>IP de un PC común (parámetros 500 a 510): se ficha tecleando el nº de empleado.</summary>
+    /// <summary>IP de un PC común (parámetros activos 500 a 599): se ficha tecleando el nº de empleado.</summary>
     public async Task<bool> EsPcComunAsync(string ip)
     {
         using var conn = Conexion();
         return await conn.ExecuteScalarAsync<int>(@"
             SELECT COUNT(*) FROM dbo.CMSParametros
-            WHERE IdParametro BETWEEN 500 AND 510 AND LTRIM(RTRIM(ValorAlfanumerico)) = @ip", new { ip }) > 0;
+            WHERE IdParametro BETWEEN 500 AND 599 AND Status = 'ACT'
+              AND LTRIM(RTRIM(ValorAlfanumerico)) = @ip", new { ip }) > 0;
     }
 
-    /// <summary>Empleado cuyo terminal personal (telefonos_aut.Id_telefono) es esta IP, o null.</summary>
+    /// <summary>
+    /// Empleado activo cuyo terminal personal (telefonos_aut.Id_telefono) es esta IP, o null.
+    /// Los desactivados no cuentan: su IP puede haberse reasignado a otro empleado.
+    /// </summary>
     public async Task<string?> EmpleadoDeTerminalAsync(string ip)
     {
         using var conn = Conexion();
         return (await conn.ExecuteScalarAsync<string?>(@"
             SELECT TOP 1 MP_CODI FROM dbo.telefonos_aut
-            WHERE LTRIM(RTRIM(Id_telefono)) = @ip ORDER BY MP_CODI", new { ip }))?.Trim();
+            WHERE LTRIM(RTRIM(Id_telefono)) = @ip AND Status = 'ACT' ORDER BY MP_CODI", new { ip }))?.Trim();
     }
 
     /// <summary>

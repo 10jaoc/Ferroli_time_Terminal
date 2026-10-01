@@ -2,7 +2,7 @@ using FerroliTime.Terminal.Services;
 
 // Terminal de marcajes de Ferroli Time (sustituye a terminal.asp de DISCOD\ASP\F_TIMER).
 // No hay login: solo pueden fichar los equipos cuya IP está en telefonos_aut (terminal
-// personal) o en los parámetros 500 a 510 (PC común). Ver Services/AccesoTerminal.cs.
+// personal) o en los parámetros activos 500 a 599 (PC común). Ver Services/AccesoTerminal.cs.
 
 var builder = WebApplication.CreateBuilder(args);
 
