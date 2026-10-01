@@ -38,8 +38,9 @@ Diferencias con la ASP:
   el nº de empleado y un Intro. El resultado sale en una ventana que se cierra a los `Terminal:SegundosMensaje`
   (15 s); el campo del lector conserva el foco para que la siguiente lectura no se pierda.
 - **Tablet: lectura con la cámara** (`wwwroot/js/camara.js`, librería html5-qrcode 2.3.8 servida en
-  `wwwroot/lib/html5-qrcode`, sin depender de internet). Se activa con «📷 Usar la cámara» y la tablet lo recuerda
-  (localStorage): tras cada fichaje la cámara se vuelve a abrir sola. Por defecto la **frontal** (la que mira a
+  `wwwroot/lib/html5-qrcode`, sin depender de internet). La cámara **se abre sola** al entrar (y tras cada
+  fichaje) si el equipo tiene una; sin cámara no se muestra nada y se usa el lector USB o el teclado. «Apagar la
+  cámara» la desactiva en ese equipo (se recuerda en localStorage) y «📷 Usar la cámara» la vuelve a activar. Por defecto la **frontal** (la que mira a
   quien ficha en una tablet fija); si hay varias, se puede elegir y también se recuerda. La misma tarjeta se
   ignora durante 20 s para que no fiche dos veces mientras sigue delante de la cámara. El navegador solo da la
   cámara en **https** (o `localhost`).

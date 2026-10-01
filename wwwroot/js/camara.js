@@ -1,7 +1,8 @@
 (function () {
   // PC común en tablet: lectura de la tarjeta con la cámara (html5-qrcode, servida en wwwroot/lib).
-  // Se activa con el botón y el equipo lo recuerda (localStorage): al volver a la pantalla tras
-  // cada fichaje la cámara se abre sola. El lector USB y el teclado siguen funcionando igual.
+  // La cámara se abre sola al entrar si el equipo tiene una, salvo que en ese equipo se haya
+  // apagado con el botón (se recuerda en localStorage, p. ej. un PC con lector USB).
+  // El lector USB y el teclado siguen funcionando igual.
   var form = document.querySelector('form[data-lector]');
   var boton = document.getElementById('btnCamara');
   if (!form || !boton) return;
@@ -14,7 +15,7 @@
   var avisoCamara = form.querySelector('[data-aviso-camara]');
   var textoLector = titulo.textContent;
 
-  var CLAVE_ACTIVA = 'fertime.camara';
+  var CLAVE_APAGADA = 'fertime.camaraApagada';
   var CLAVE_ID = 'fertime.camaraId';
   var CLAVE_ULTIMA = 'fertime.ultimaLectura';
   // Tras fichar, la misma tarjeta sigue delante de la cámara: se ignora durante este tiempo.
@@ -62,7 +63,11 @@
     } catch (e) { /* sin permiso todavía: se rellena después de abrir la cámara */ }
   }
 
-  async function iniciar() {
+  // Sin cámara (o sin permiso para usarla en una apertura automática) no se molesta con avisos:
+  // el equipo sigue funcionando con el lector USB o el teclado.
+  function sinCamara(e) { return /NotFound|DevicesNotFound|NotReadable|TrackStart/i.test(String(e && (e.name || e))); }
+
+  async function iniciar(automatico) {
     if (scanner) return;
     aviso('');
     mostrarActiva(true);
@@ -95,7 +100,13 @@
     } catch (e) {
       scanner = null;
       mostrarActiva(false);
-      if (id) guardar(CLAVE_ID, null); // la cámara elegida ya no existe: se vuelve a la automática
+      if (id) {
+        // La cámara elegida ya no existe: se vuelve a la automática.
+        guardar(CLAVE_ID, null);
+        return iniciar(automatico);
+      }
+      if (automatico && sinCamara(e)) { boton.hidden = true; campo.focus(); return; }
+      campo.focus();
       aviso('No se ha podido abrir la cámara. ' + (location.protocol !== 'https:' && location.hostname !== 'localhost'
         ? 'El navegador solo permite la cámara en páginas https.'
         : 'Compruebe que el navegador tiene permiso para usarla.'));
@@ -126,20 +137,26 @@
   }
 
   boton.addEventListener('click', function () {
-    if (scanner) { guardar(CLAVE_ACTIVA, null); detener(); }
-    else { guardar(CLAVE_ACTIVA, '1'); iniciar(); }
+    if (scanner) { guardar(CLAVE_APAGADA, '1'); detener().then(function () { campo.focus(); }); }
+    else { guardar(CLAVE_APAGADA, null); iniciar(false); }
   });
 
   selector.addEventListener('change', async function () {
     guardar(CLAVE_ID, selector.value || null);
     await detener();
-    iniciar();
+    iniciar(false);
   });
 
-  // Este equipo ya usaba la cámara: se abre sola. El atributo se pone ya, antes de que
-  // terminal.js decida si enfoca el campo.
-  if (leer(CLAVE_ACTIVA) === '1') {
+  // Apertura automática: solo si el equipo tiene cámara y no se apagó aquí con el botón.
+  // El atributo se pone ya, antes de que terminal.js decida si enfoca el campo (teclado de la tablet).
+  if (leer(CLAVE_APAGADA) !== '1') {
     form.setAttribute('data-camara-activa', '');
-    iniciar();
+    navigator.mediaDevices.enumerateDevices()
+      .then(function (d) { return d.some(function (x) { return x.kind === 'videoinput'; }); })
+      .catch(function () { return true; })
+      .then(function (hay) {
+        if (hay) iniciar(true);
+        else { form.removeAttribute('data-camara-activa'); boton.hidden = true; campo.focus(); }
+      });
   }
 })();
