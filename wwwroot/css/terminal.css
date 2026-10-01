@@ -37,6 +37,11 @@ body {
 .reloj { display: flex; align-items: baseline; gap: .75rem; font-variant-numeric: tabular-nums; }
 .reloj .hora { font-size: 1.6rem; font-weight: 700; }
 .reloj .fecha { opacity: .85; }
+.derecha { display: flex; align-items: center; gap: 1rem; }
+.rueda-config { color: #fff; display: inline-flex; padding: .3rem; border-radius: 6px; opacity: .85; }
+.rueda-config:hover, .rueda-config:focus-visible { opacity: 1; background: rgba(255, 255, 255, .15); }
+.rueda-config svg { transition: transform .3s; }
+.rueda-config:hover svg { transform: rotate(45deg); }
 
 main { max-width: 720px; margin: 0 auto; padding: 1.5rem 16px; }
 
@@ -115,7 +120,27 @@ tr:nth-child(even) td { background: var(--azul-claro); }
 .alerta.aviso { background: var(--aviso-fondo); color: #5c4b00; border: 1px solid #d8b400; }
 .mensaje-fichaje { font-size: 1.15rem; font-weight: 600; text-align: center; }
 
+/* Configuración del terminal: campos de formulario normales (no los grandes del nº de empleado). */
+.cabecera-config { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.form-config { display: grid; gap: 1.1rem; }
+.form-config fieldset { border: 1px solid var(--gris-borde); border-radius: 6px; padding: 1rem; display: grid; gap: .9rem; margin: 0; min-width: 0; }
+.form-config legend { font-weight: 700; color: var(--azul-oscuro); padding: 0 .4rem; }
+.form-config input { font-size: 1rem; letter-spacing: normal; padding: .5rem; }
+.form-config small { font-weight: 400; color: #5a6b7b; }
+.form-config .fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.form-config .fila-2 > div { display: flex; flex-direction: column; }
+.form-config .fila-2 > div > label { flex: 1; }
+.form-config label.check { display: flex; align-items: center; gap: .5rem; font-weight: 400; margin: 0; }
+.form-config label.check input { width: auto; }
+.form-config .detalle { margin: 0; }
+.tabla-scroll { overflow-x: auto; }
+table.localizaciones { min-width: 520px; margin: 0; }
+table.localizaciones td { padding: .3rem; }
+table.localizaciones tr:nth-child(even) td { background: #fff; }
+.botones-config { display: flex; gap: .5rem; flex-wrap: wrap; }
+
 @media (max-width: 640px) {
+  .form-config .fila-2 { grid-template-columns: 1fr; }
   .app-header { padding: .6rem 16px; }
   .reloj .hora { font-size: 1.3rem; }
   .panel { padding: 1rem; }

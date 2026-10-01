@@ -48,6 +48,19 @@ Diferencias con la ASP:
 | `Terminal:Localizaciones` / `LocalizacionDefecto` | Texto de `DESC_LOCA` según el principio de la IP. |
 | `Terminal:IpSimulada` | **Solo en Development**: fichar desde el PC de desarrollo como si fuera esa IP. |
 
+### Página de configuración (rueda de la cabecera)
+
+La rueda de la derecha de la cabecera abre `/Configuracion`, que edita `appsettings.json` (conexión a la base
+de datos, nombre, minutos entre marcajes, fin de semana, inactividad y localizaciones). **Solo se ve y solo se
+puede entrar** desde la IP que es el terminal personal de un empleado **activo** con `telefonos_aut.config = 1`
+(se marca en el backoffice: Terminales/Empleados → «¿Acceso a la configuración del terminal?»). Desde
+cualquier otro equipo devuelve 403.
+
+- Antes de guardar se prueba la conexión: una cadena que no funciona no se guarda.
+- Se deja copia en `appsettings.json.bak`, se escribe sin dejar el fichero a medias y se aplica sin reiniciar.
+- La contraseña de la base de datos nunca se muestra; en blanco = no cambiarla.
+- Cada cambio queda en el log con el empleado y la IP.
+
 `appsettings.json` contiene contraseñas y no se sube a Git; la plantilla es `appsettings.example.json`.
 
 ## Puesta en marcha

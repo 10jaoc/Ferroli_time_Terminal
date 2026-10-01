@@ -45,6 +45,19 @@ public class TerminalRepository(string connStr)
     }
 
     /// <summary>
+    /// Empleado activo con acceso a la configuración del terminal (telefonos_aut.config = 1)
+    /// cuyo terminal personal es esta IP, o null.
+    /// </summary>
+    public async Task<Empleado?> ConfiguradorDeTerminalAsync(string ip)
+    {
+        using var conn = Conexion();
+        return await conn.QuerySingleOrDefaultAsync<Empleado>(@"
+            SELECT TOP 1 RTRIM(MP_CODI) AS MP_CODI, descripcion AS Descripcion FROM dbo.telefonos_aut
+            WHERE LTRIM(RTRIM(Id_telefono)) = @ip AND Status = 'ACT' AND config = 1
+            ORDER BY MP_CODI", new { ip });
+    }
+
+    /// <summary>
     /// Oficina abierta: el parámetro 10 no tiene Valor numérico 0 y la hora está dentro del
     /// horario del parámetro 11 (Numérico desde / hasta, en horas decimales).
     /// </summary>

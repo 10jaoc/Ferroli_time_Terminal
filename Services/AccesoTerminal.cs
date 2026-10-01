@@ -33,6 +33,26 @@ public class AccesoTerminal(
         return (ip.IsIPv4MappedToIPv6 ? ip.MapToIPv4() : ip).ToString();
     }
 
+    /// <summary>
+    /// Empleado que puede entrar en la configuración del terminal desde este equipo: el de la IP,
+    /// activo y con config = 1. Null si no hay ninguno.
+    /// </summary>
+    public async Task<Empleado?> ConfiguradorAsync()
+    {
+        var ip = IpCliente();
+        return ip == "" ? null : await repo.ConfiguradorDeTerminalAsync(ip);
+    }
+
+    /// <summary>
+    /// Para la cabecera (rueda de configuración): si falla la base de datos devuelve false en vez
+    /// de romper la página, que puede ser la de error.
+    /// </summary>
+    public async Task<bool> PuedeConfigurarAsync()
+    {
+        try { return await ConfiguradorAsync() != null; }
+        catch { return false; }
+    }
+
     public async Task<Acceso> ComprobarAsync()
     {
         var ip = IpCliente();

@@ -1,0 +1,125 @@
+@page
+@model ConfiguracionModel
+@{ ViewData["Title"] = "Configuración"; }
+
+@if (Model.Configurador is null)
+{
+  <div class="panel cerrado">
+    <h1>Sin acceso a la configuración</h1>
+    <p>Este equipo no tiene permiso para cambiar la configuración del terminal.</p>
+    <p class="detalle">IP: <strong>@(string.IsNullOrEmpty(Model.Ip) ? "desconocida" : Model.Ip)</strong></p>
+    <a href="~/" class="boton secundario">Volver</a>
+  </div>
+  return;
+}
+
+<div class="panel">
+  <div class="cabecera-config">
+    <h1>Configuración del terminal</h1>
+    <a href="~/" class="boton secundario">Volver</a>
+  </div>
+  <p class="detalle">
+    @Model.Configurador.MP_CODI · @Model.Configurador.Descripcion?.Trim() · IP @Model.Ip
+  </p>
+
+  @if (TempData["Exito"] is string exito)
+  {
+    <div class="alerta exito">@exito</div>
+  }
+  @if (!string.IsNullOrEmpty(Model.Exito))
+  {
+    <div class="alerta exito">@Model.Exito</div>
+  }
+  @if (!string.IsNullOrEmpty(Model.Error))
+  {
+    <div class="alerta error">@Model.Error</div>
+  }
+
+  <form method="post" class="form-config" autocomplete="off">
+    <fieldset>
+      <legend>Base de datos</legend>
+      <div class="fila-2">
+        <div>
+          <label for="servidor">Servidor</label>
+          <input id="servidor" asp-for="Datos.Servidor" required />
+        </div>
+        <div>
+          <label for="basedatos">Base de datos</label>
+          <input id="basedatos" asp-for="Datos.BaseDatos" required />
+        </div>
+      </div>
+      <div class="fila-2">
+        <div>
+          <label for="usuariobd">Usuario</label>
+          <input id="usuariobd" asp-for="Datos.UsuarioBd" />
+        </div>
+        <div>
+          <label for="clavebd">Contraseña <small>(en blanco = no cambiar)</small></label>
+          <input id="clavebd" asp-for="Datos.ClaveBd" type="password" autocomplete="new-password" />
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" asp-for="Datos.Encrypt" /> Cifrar la conexión (Encrypt)</label>
+      <label class="check"><input type="checkbox" asp-for="Datos.TrustServerCertificate" /> Confiar en el certificado del servidor</label>
+      <div><button type="submit" class="secundario" asp-page-handler="ProbarBd" formnovalidate>Probar conexión</button></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fichaje</legend>
+      <div>
+        <label for="nombre">Nombre de la aplicación <small>(cabecera)</small></label>
+        <input id="nombre" asp-for="Datos.Nombre" required />
+      </div>
+      <div class="fila-2">
+        <div>
+          <label for="minutos">Minutos entre marcajes <small>(sin repetir)</small></label>
+          <input id="minutos" asp-for="Datos.MinutosEntreMarcajes" type="number" min="0" max="120" />
+        </div>
+        <div>
+          <label for="segundos">Segundos de inactividad <small>(PC común)</small></label>
+          <input id="segundos" asp-for="Datos.SegundosInactividad" type="number" min="5" max="600" />
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" asp-for="Datos.PermitirFinDeSemana" /> Permitir fichar sábados y domingos</label>
+      @if (Model.EsDesarrollo)
+      {
+        <div>
+          <label for="ipsimulada">IP simulada <small>(solo en desarrollo)</small></label>
+          <input id="ipsimulada" asp-for="Datos.IpSimulada" />
+        </div>
+      }
+    </fieldset>
+
+    <fieldset>
+      <legend>Localizaciones</legend>
+      <p class="detalle">
+        Texto que se graba en el marcaje según el principio de la IP del equipo. Se usa la primera fila
+        que coincida. Para quitar una fila, deje vacíos el prefijo y el texto.
+      </p>
+      <div class="tabla-scroll">
+        <table class="localizaciones">
+          <thead><tr><th style="width:30%">Prefijo de IP</th><th>Texto (DESC_LOCA)</th></tr></thead>
+          <tbody>
+            @for (var i = 0; i < Model.Datos.Localizaciones.Count; i++)
+            {
+              <tr>
+                <td><input name="Datos.Localizaciones[@i].Prefijo" value="@Model.Datos.Localizaciones[i].Prefijo"
+                           placeholder="172.22.0." aria-label="Prefijo de IP, fila @(i + 1)" /></td>
+                <td><input name="Datos.Localizaciones[@i].Texto" value="@Model.Datos.Localizaciones[i].Texto" maxlength="256"
+                           aria-label="Texto, fila @(i + 1)" /></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <label for="locdefecto">Localización por defecto <small>(si la IP no coincide con ninguna)</small></label>
+        <input id="locdefecto" asp-for="Datos.LocalizacionDefecto" maxlength="256" required />
+      </div>
+    </fieldset>
+
+    <div class="botones-config">
+      <button type="submit">Guardar</button>
+      <a href="~/" class="boton secundario">Volver</a>
+    </div>
+  </form>
+</div>

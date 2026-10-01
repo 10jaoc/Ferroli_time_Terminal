@@ -1,9 +1,12 @@
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuracion
+@inject FerroliTime.Terminal.Services.AccesoTerminal Acceso
 @{
   var nombreApp = Configuracion["App:Nombre"] ?? "Ferroli Time";
   // Hora local del servidor (la que se graba), enviada "como si fuera UTC" para que el
   // navegador la pinte tal cual, sin aplicar la zona horaria del equipo.
   var servidorMs = new DateTimeOffset(DateTime.Now.Ticks, TimeSpan.Zero).ToUnixTimeMilliseconds();
+  // La rueda solo se ve desde el terminal de un empleado activo con config = 1.
+  var puedeConfigurar = await Acceso.PuedeConfigurarAsync();
 }
 <!doctype html>
 <html lang="es">
@@ -22,9 +25,21 @@
     <img src="~/images/ferroli-logo-b.png" alt="Ferroli" class="app-logo" />
     <span>@nombreApp</span>
   </div>
-  <div class="reloj" id="reloj" data-servidor="@servidorMs">
-    <span class="hora"></span>
-    <span class="fecha"></span>
+  <div class="derecha">
+    <div class="reloj" id="reloj" data-servidor="@servidorMs">
+      <span class="hora"></span>
+      <span class="fecha"></span>
+    </div>
+    @if (puedeConfigurar)
+    {
+      <a href="~/Configuracion" class="rueda-config" title="Configuración del terminal" aria-label="Configuración del terminal">
+        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </a>
+    }
   </div>
 </header>
 <main>

@@ -16,6 +16,7 @@ if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("SqlServ
 builder.Services.AddScoped(sp =>
     new TerminalRepository(sp.GetRequiredService<IConfiguration>().GetConnectionString("SqlServer")!));
 builder.Services.AddScoped<AccesoTerminal>();
+builder.Services.AddScoped<ConfiguracionService>();
 
 var app = builder.Build();
 
