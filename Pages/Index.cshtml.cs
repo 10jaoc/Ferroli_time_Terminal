@@ -22,6 +22,10 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
     public string? Error { get; private set; }
     public DateTime Ahora { get; } = DateTime.Now;
     public int SegundosMensaje => opciones.CurrentValue.SegundosMensaje;
+    public bool SelectorCamara => opciones.CurrentValue.SelectorCamara == 1;
+
+    /// <summary>Reloj que deben tener en su ficha los empleados que fichan en un PC común (Reloj Tablet).</summary>
+    private const string RelojPcComun = "99";
 
     public bool Abierto => Terminal.Tipo != TipoTerminal.NoAutorizado && MotivoCerrado == null;
 
@@ -112,12 +116,19 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
         // Nº de empleado de 8 dígitos: los numéricos se completan con ceros a la izquierda.
         if (codigo.Length < 8 && codigo.All(char.IsAsciiDigit)) codigo = codigo.PadLeft(8, '0');
 
-        Empleado = await repo.EmpleadoAsync(codigo, soloReloj99: Terminal.Tipo == TipoTerminal.PcComun);
-        if (Empleado is null)
+        // El empleado tiene que estar en Terminales/Empleados, activo y, en un PC común (lector o
+        // cámara), con reloj 99 en su ficha, como en terminal.asp. Desde su terminal personal vale cualquier reloj.
+        var ficha = await repo.FichaEmpleadoAsync(codigo);
+        // Uno desactivado se trata como inexistente (no se muestra su nombre).
+        Error = ficha switch
         {
-            Error = $"El código {codigo} no corresponde a ningún empleado. Inténtelo de nuevo.";
-            return false;
-        }
+            null or { Activo: false } => $"Empleado inexistente ({codigo}).",
+            _ when Terminal.Tipo == TipoTerminal.PcComun && ficha.Reloj != RelojPcComun =>
+                $"{ficha.Nombre}: usuario no autorizado a usar este tipo de terminal.",
+            _ => null,
+        };
+        if (Error != null) return false;
+        Empleado = new Empleado(ficha!.MP_CODI, ficha.Descripcion);
 
         Marcajes = await repo.MarcajesDelDiaAsync(Empleado.MP_CODI, Ahora);
         TocaEntrada = TerminalRepository.TocaEntrada(Marcajes);

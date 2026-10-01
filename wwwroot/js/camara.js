@@ -11,8 +11,9 @@
   var campo = form.querySelector('input[name=codigo]');
   var zona = form.querySelector('[data-camara]');
   var selector = document.getElementById('camaras');
-  var titulo = form.querySelector('label[for=codigo]');
-  var avisoCamara = form.querySelector('[data-aviso-camara]');
+  // Si falta algún elemento (p. ej. una página en caché de otra versión), la cámara funciona igual.
+  var titulo = form.querySelector('[data-titulo-lector], label[for=codigo]') || document.createElement('p');
+  var avisoCamara = form.querySelector('[data-aviso-camara]') || document.createElement('p');
   var textoLector = titulo.textContent;
 
   var CLAVE_APAGADA = 'fertime.camaraApagada';
@@ -20,6 +21,11 @@
   var CLAVE_ULTIMA = 'fertime.ultimaLectura';
   // Tras fichar, la misma tarjeta sigue delante de la cámara: se ignora durante este tiempo.
   var IGNORAR_MS = 20000;
+  // Terminal:SelectorCamara = 1 en appsettings.json: se puede elegir la cámara y apagarla/encenderla.
+  // Con 0 (terminal de planta) no hay desplegable ni botón: la cámara está siempre activa, en la
+  // elegida antes en este equipo (o la frontal).
+  var permitirSelector = form.getAttribute('data-selector-camara') === '1';
+  if (!permitirSelector) boton.hidden = true;
 
   var scanner = null;
   var enviado = false;
@@ -34,8 +40,7 @@
     avisoCamara.hidden = !texto;
   }
 
-  // Estado visible: el atributo data-camara-activa lo mira terminal.js para no forzar el foco
-  // en el campo (en la tablet abriría el teclado de pantalla todo el rato).
+  // Estado visible (el atributo data-camara-activa oculta el icono del lector en el CSS).
   function mostrarActiva(activa) {
     form.toggleAttribute('data-camara-activa', activa);
     zona.hidden = !activa;
@@ -59,7 +64,8 @@
         selector.appendChild(o);
       });
       selector.value = lista.some(function (c) { return c.id === elegida; }) ? elegida : '';
-      selector.hidden = lista.length < 2;
+      selector.hidden = !permitirSelector || lista.length < 2;
+      selector.disabled = !permitirSelector;
     } catch (e) { /* sin permiso todavía: se rellena después de abrir la cámara */ }
   }
 
@@ -105,8 +111,7 @@
         guardar(CLAVE_ID, null);
         return iniciar(automatico);
       }
-      if (automatico && sinCamara(e)) { boton.hidden = true; campo.focus(); return; }
-      campo.focus();
+      if (automatico && sinCamara(e)) { boton.hidden = true; return; }
       aviso('No se ha podido abrir la cámara. ' + (location.protocol !== 'https:' && location.hostname !== 'localhost'
         ? 'El navegador solo permite la cámara en páginas https.'
         : 'Compruebe que el navegador tiene permiso para usarla.'));
@@ -137,26 +142,30 @@
   }
 
   boton.addEventListener('click', function () {
-    if (scanner) { guardar(CLAVE_APAGADA, '1'); detener().then(function () { campo.focus(); }); }
+    if (!permitirSelector) return;
+    boton.blur(); // que el Intro del lector USB no vuelva a pulsar el botón
+    if (scanner) { guardar(CLAVE_APAGADA, '1'); detener(); }
     else { guardar(CLAVE_APAGADA, null); iniciar(false); }
   });
 
   selector.addEventListener('change', async function () {
+    if (!permitirSelector) return;
     guardar(CLAVE_ID, selector.value || null);
+    selector.blur();
     await detener();
     iniciar(false);
   });
 
-  // Apertura automática: solo si el equipo tiene cámara y no se apagó aquí con el botón.
-  // El atributo se pone ya, antes de que terminal.js decida si enfoca el campo (teclado de la tablet).
-  if (leer(CLAVE_APAGADA) !== '1') {
+  // Apertura automática si el equipo tiene cámara. Solo se respeta que se apagara aquí con el botón
+  // cuando el botón está permitido; en un terminal de planta se abre siempre.
+  if (!permitirSelector || leer(CLAVE_APAGADA) !== '1') {
     form.setAttribute('data-camara-activa', '');
     navigator.mediaDevices.enumerateDevices()
       .then(function (d) { return d.some(function (x) { return x.kind === 'videoinput'; }); })
       .catch(function () { return true; })
       .then(function (hay) {
         if (hay) iniciar(true);
-        else { form.removeAttribute('data-camara-activa'); boton.hidden = true; campo.focus(); }
+        else { form.removeAttribute('data-camara-activa'); boton.hidden = true; }
       });
   }
 })();

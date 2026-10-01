@@ -48,15 +48,16 @@
 
   @if (Model.Terminal.Tipo == TipoTerminal.PcComun)
   {
-    @* PC común: el lector de códigos de barras teclea el nº de empleado y un Intro, que envía el formulario. *@
-    <form method="post" asp-page-handler="Leer" class="form-codigo form-lector" data-lector>
+    @* PC común: solo con la tarjeta, por el lector USB o la cámara; no se puede teclear el número.
+       El nº leído va en un campo oculto (terminal.js / camara.js) y se envía solo. *@
+    <form method="post" asp-page-handler="Leer" class="form-codigo form-lector" data-lector
+          data-selector-camara="@(Model.SelectorCamara ? "1" : "0")">
       <svg class="icono-lector" viewBox="0 0 64 40" aria-hidden="true">
         <path d="M4 4h3v32H4zM10 4h2v32h-2zM15 4h4v32h-4zM22 4h2v32h-2zM27 4h3v32h-3zM33 4h2v32h-2zM38 4h4v32h-4zM45 4h2v32h-2zM50 4h3v32h-3zM56 4h4v32h-4z" />
       </svg>
-      <label for="codigo">Pase su tarjeta por el lector</label>
-      <p class="detalle">o teclee su nº de empleado y pulse Intro</p>
-      <input id="codigo" name="codigo" inputmode="numeric" maxlength="30" autocomplete="off" />
-      <button type="submit">Fichar</button>
+      <p class="titulo-lector" data-titulo-lector>Pase su tarjeta por el lector</p>
+      <input type="hidden" name="codigo" />
+      <p class="alerta aviso" data-solo-tarjeta hidden>Use su tarjeta en el lector o en la cámara: no se puede teclear el número.</p>
 
       @* Tablet: lectura con la cámara (wwwroot/js/camara.js). *@
       <div class="camara" data-camara hidden>

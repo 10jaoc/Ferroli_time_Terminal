@@ -12,6 +12,13 @@ public class TerminalOptions
     /// <summary>PC común: segundos que se ve la ventana con el resultado del fichaje antes de cerrarse.</summary>
     public int SegundosMensaje { get; set; } = 15;
 
+    /// <summary>
+    /// 1 = en el PC común se puede elegir la cámara (desplegable) y apagarla o encenderla (botón).
+    /// 0 = terminal de planta: sin desplegable ni botón, cámara siempre activa (la elegida antes en
+    /// ese equipo o, si no hay, la frontal).
+    /// </summary>
+    public int SelectorCamara { get; set; }
+
     /// <summary>Localización (DESC_LOCA) del marcaje según el principio de la IP del terminal.</summary>
     public List<Localizacion> Localizaciones { get; set; } = [];
 

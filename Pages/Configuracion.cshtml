@@ -80,6 +80,13 @@
         </div>
       </div>
       <label class="check"><input type="checkbox" asp-for="Datos.PermitirFinDeSemana" /> Permitir fichar sábados y domingos</label>
+      <div>
+        <label for="selectorcamara">Selector y botón de la cámara <small>(PC común: elegir la cámara y apagarla)</small></label>
+        <select id="selectorcamara" name="Datos.SelectorCamara" class="campo-select">
+          <option value="0" selected="@(Model.Datos.SelectorCamara != 1)">0 - No (terminal de planta: cámara siempre activa)</option>
+          <option value="1" selected="@(Model.Datos.SelectorCamara == 1)">1 - Sí</option>
+        </select>
+      </div>
       @if (Model.EsDesarrollo)
       {
         <div>

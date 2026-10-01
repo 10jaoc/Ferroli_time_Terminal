@@ -108,7 +108,7 @@ button:hover, .boton:hover { opacity: .9; }
 
 /* PC común: lectura de la tarjeta con el lector de códigos de barras. */
 .form-lector { text-align: center; }
-.form-lector label { font-size: 1.4rem; color: var(--azul-oscuro); margin: 0; }
+.form-lector .titulo-lector { font-size: 1.4rem; font-weight: 600; color: var(--azul-oscuro); margin: 0; }
 .form-lector .detalle { margin: 0; }
 .form-lector input { text-align: center; }
 .icono-lector { width: 96px; height: 60px; margin: 0 auto; fill: var(--azul-oscuro); opacity: .85; }
@@ -167,6 +167,7 @@ tr:nth-child(even) td { background: var(--azul-claro); }
 .form-config .fila-2 > div > label { flex: 1; }
 .form-config label.check { display: flex; align-items: center; gap: .5rem; font-weight: 400; margin: 0; }
 .form-config label.check input { width: auto; }
+.form-config select { width: 100%; padding: .5rem; font-size: 1rem; border: 1px solid var(--gris-borde); border-radius: 6px; }
 .form-config .detalle { margin: 0; }
 .tabla-scroll { overflow-x: auto; }
 table.localizaciones { min-width: 520px; margin: 0; }

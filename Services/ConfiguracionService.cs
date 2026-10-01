@@ -23,6 +23,8 @@ public class AjustesTerminal
     public int MinutosEntreMarcajes { get; set; } = 5;
     public bool PermitirFinDeSemana { get; set; }
     public int SegundosMensaje { get; set; } = 15;
+    /// <summary>1 = se puede elegir la cámara en el PC común; 0 = no.</summary>
+    public int SelectorCamara { get; set; }
     public string LocalizacionDefecto { get; set; } = "";
     public List<Localizacion> Localizaciones { get; set; } = [];
     /// <summary>Solo se edita en Development (en producción se ignora y se conserva).</summary>
@@ -54,6 +56,7 @@ public class ConfiguracionService(IConfiguration config, IWebHostEnvironment env
             MinutosEntreMarcajes = t.MinutosEntreMarcajes,
             PermitirFinDeSemana = t.PermitirFinDeSemana,
             SegundosMensaje = t.SegundosMensaje,
+            SelectorCamara = t.SelectorCamara == 1 ? 1 : 0,
             LocalizacionDefecto = t.LocalizacionDefecto,
             Localizaciones = t.Localizaciones,
             IpSimulada = t.IpSimulada,
@@ -106,6 +109,7 @@ public class ConfiguracionService(IConfiguration config, IWebHostEnvironment env
             t["MinutosEntreMarcajes"] = a.MinutosEntreMarcajes;
             t["PermitirFinDeSemana"] = a.PermitirFinDeSemana;
             t["SegundosMensaje"] = a.SegundosMensaje;
+            t["SelectorCamara"] = a.SelectorCamara == 1 ? 1 : 0;
             t.Remove("SegundosInactividad"); // ya no se usa (el PC común ficha al leer la tarjeta)
             t["LocalizacionDefecto"] = a.LocalizacionDefecto.Trim();
             var lista = new JsonArray();

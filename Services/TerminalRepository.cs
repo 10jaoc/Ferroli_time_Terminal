@@ -6,6 +6,14 @@ namespace FerroliTime.Terminal.Services;
 
 public record Empleado(string MP_CODI, string? Descripcion);
 
+/// <summary>Ficha del empleado en telefonos_aut, sin filtrar, para explicar por qué no puede fichar.</summary>
+public record FichaEmpleado(string MP_CODI, string? Descripcion, string? Status, string? MP_RELO)
+{
+    public bool Activo => Status?.Trim() == "ACT";
+    public string Reloj => MP_RELO?.Trim() ?? "";
+    public string Nombre => $"{Descripcion?.Trim()} ({MP_CODI})";
+}
+
 public class MarcajeDia
 {
     public string MP_HORA { get; set; } = "";
@@ -71,17 +79,13 @@ public class TerminalRepository(string connStr)
                OR (IdParametro = 11 AND (NumericoHasta < @hora OR NumericoDesde > @hora))", new { hora }) == 0;
     }
 
-    /// <summary>
-    /// Empleado activo. Desde un PC común solo valen los de reloj 99 (como en terminal.asp);
-    /// desde su terminal personal, cualquiera.
-    /// </summary>
-    public async Task<Empleado?> EmpleadoAsync(string codigo, bool soloReloj99)
+    /// <summary>Ficha del empleado en telefonos_aut (Terminales/Empleados del backoffice), o null si no existe.</summary>
+    public async Task<FichaEmpleado?> FichaEmpleadoAsync(string codigo)
     {
         using var conn = Conexion();
-        return await conn.QuerySingleOrDefaultAsync<Empleado>($@"
-            SELECT TOP 1 RTRIM(MP_CODI) AS MP_CODI, descripcion AS Descripcion FROM dbo.telefonos_aut
-            WHERE MP_CODI = @codigo AND Status = 'ACT'{(soloReloj99 ? " AND MP_RELO = '99'" : "")}",
-            new { codigo });
+        return await conn.QuerySingleOrDefaultAsync<FichaEmpleado>(@"
+            SELECT TOP 1 RTRIM(MP_CODI) AS MP_CODI, descripcion AS Descripcion, Status, MP_RELO
+            FROM dbo.telefonos_aut WHERE MP_CODI = @codigo", new { codigo });
     }
 
     public async Task<List<MarcajeDia>> MarcajesDelDiaAsync(string codigo, DateTime dia)
