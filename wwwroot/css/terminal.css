@@ -13,6 +13,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -104,7 +105,42 @@ button:hover, .boton:hover { opacity: .9; }
 }
 .boton-fichar.entrada { background: var(--entrada); border-color: var(--entrada); }
 .boton-fichar.salida { background: var(--salida); border-color: var(--salida); }
-.otro-empleado { display: block; margin-top: .9rem; }
+
+/* PC común: lectura de la tarjeta con el lector de códigos de barras. */
+.form-lector { text-align: center; }
+.form-lector label { font-size: 1.4rem; color: var(--azul-oscuro); margin: 0; }
+.form-lector .detalle { margin: 0; }
+.form-lector input { text-align: center; }
+.icono-lector { width: 96px; height: 60px; margin: 0 auto; fill: var(--azul-oscuro); opacity: .85; }
+.form-lector[data-camara-activa] .icono-lector { display: none; }
+.camara { display: grid; gap: .5rem; }
+.camara #lector { width: 100%; max-width: 560px; margin: 0 auto; border-radius: 8px; overflow: hidden; background: #000; }
+.camara #lector video { display: block; width: 100% !important; }
+.camara select { width: 100%; padding: .5rem; font-size: 1rem; border: 1px solid var(--gris-borde); border-radius: 6px; }
+.form-lector [data-aviso-camara] { margin: 0; text-align: left; }
+
+/* Resultado del fichaje: ventana sobre la pantalla que se cierra sola. */
+.resultado-fichaje {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px; background: rgba(23, 54, 93, .55);
+}
+.resultado-fichaje .caja {
+  background: #fff; border-radius: 12px; border-top: 12px solid var(--azul-oscuro);
+  padding: 2rem 1.5rem 1.5rem; width: min(560px, 100%); text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+}
+.resultado-fichaje .titulo { font-size: 2rem; font-weight: 800; letter-spacing: .03em; }
+.resultado-fichaje .texto { font-size: 1.3rem; margin: .9rem 0 1.2rem; }
+.resultado-fichaje .cuenta { color: #5a6b7b; margin-bottom: 1rem; font-variant-numeric: tabular-nums; }
+.resultado-fichaje.entrada .caja { border-top-color: var(--entrada); }
+.resultado-fichaje.entrada .titulo { color: var(--entrada); }
+.resultado-fichaje.salida .caja { border-top-color: var(--salida); }
+.resultado-fichaje.salida .titulo { color: var(--salida); }
+.resultado-fichaje.aviso .caja { border-top-color: #d8b400; }
+.resultado-fichaje.aviso .titulo { color: #5c4b00; }
+.resultado-fichaje.error .caja { border-top-color: var(--error); }
+.resultado-fichaje.error .titulo { color: var(--error); }
 
 table { width: 100%; border-collapse: collapse; margin: .5rem 0; }
 th, td { border: 1px solid var(--gris-borde); padding: .5rem .65rem; text-align: left; font-size: .95rem; }
@@ -118,7 +154,6 @@ tr:nth-child(even) td { background: var(--azul-claro); }
 .alerta.error { background: #fde8e6; color: var(--error); border: 1px solid var(--error); }
 .alerta.exito { background: #e6f4ea; color: var(--exito); border: 1px solid var(--exito); }
 .alerta.aviso { background: var(--aviso-fondo); color: #5c4b00; border: 1px solid #d8b400; }
-.mensaje-fichaje { font-size: 1.15rem; font-weight: 600; text-align: center; }
 
 /* Configuración del terminal: campos de formulario normales (no los grandes del nº de empleado). */
 .cabecera-config { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
@@ -145,5 +180,7 @@ table.localizaciones tr:nth-child(even) td { background: #fff; }
   .reloj .hora { font-size: 1.3rem; }
   .panel { padding: 1rem; }
   .boton-fichar { font-size: 1.8rem; padding: 1.1rem; }
+  .resultado-fichaje .titulo { font-size: 1.5rem; }
+  .resultado-fichaje .texto { font-size: 1.1rem; }
   th, td { font-size: .85rem; padding: .4rem; }
 }

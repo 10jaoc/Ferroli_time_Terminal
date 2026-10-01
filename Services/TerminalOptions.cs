@@ -9,8 +9,8 @@ public class TerminalOptions
     /// <summary>terminal.asp no deja fichar sábados ni domingos.</summary>
     public bool PermitirFinDeSemana { get; set; }
 
-    /// <summary>Segundos tras los que un PC común vuelve a pedir el nº de empleado si nadie ficha.</summary>
-    public int SegundosInactividad { get; set; } = 30;
+    /// <summary>PC común: segundos que se ve la ventana con el resultado del fichaje antes de cerrarse.</summary>
+    public int SegundosMensaje { get; set; } = 15;
 
     /// <summary>Localización (DESC_LOCA) del marcaje según el principio de la IP del terminal.</summary>
     public List<Localizacion> Localizaciones { get; set; } = [];

@@ -108,8 +108,8 @@ public class ConfiguracionModel(AccesoTerminal acceso, ConfiguracionService conf
             return "El nombre de la aplicación es obligatorio.";
         if (Datos.MinutosEntreMarcajes is < 0 or > 120)
             return "Minutos entre marcajes: entre 0 y 120.";
-        if (Datos.SegundosInactividad is < 5 or > 600)
-            return "Segundos de inactividad: entre 5 y 600.";
+        if (Datos.SegundosMensaje is < 3 or > 120)
+            return "Segundos del mensaje: entre 3 y 120.";
         if (string.IsNullOrWhiteSpace(Datos.LocalizacionDefecto))
             return "La localización por defecto es obligatoria.";
         if (Datos.LocalizacionDefecto.Trim().Length > 256 || Datos.Localizaciones.Any(l => l.Texto.Length > 256))

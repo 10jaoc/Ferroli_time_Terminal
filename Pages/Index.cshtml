@@ -3,9 +3,17 @@
 @using FerroliTime.Terminal.Services
 @{ ViewData["Title"] = "Marcajes"; }
 
-@if (TempData["Mensaje"] is string mensaje)
+@if (TempData["ResultadoTipo"] is string tipoResultado)
 {
-  <div class="alerta @((TempData["MensajeOk"] as bool?) == true ? "exito" : "aviso") mensaje-fichaje" data-ocultar="6">@mensaje</div>
+  @* Resultado del fichaje: se cierra solo a los SegundosMensaje (o al tocarlo). *@
+  <div class="resultado-fichaje @tipoResultado" data-cerrar="@Model.SegundosMensaje" role="alert">
+    <div class="caja">
+      <div class="titulo">@TempData["ResultadoTitulo"]</div>
+      <div class="texto">@TempData["ResultadoTexto"]</div>
+      <div class="cuenta">Se cierra en <span data-cuenta>@Model.SegundosMensaje</span> s</div>
+      <button type="button" class="secundario">Cerrar</button>
+    </div>
+  </div>
 }
 
 @if (Model.Terminal.Tipo == TipoTerminal.NoAutorizado)
@@ -38,35 +46,41 @@
     <div class="alerta error">@Model.Error</div>
   }
 
-  @if (Model.Empleado is null)
+  @if (Model.Terminal.Tipo == TipoTerminal.PcComun)
   {
-    @* PC común: pedir nº de empleado *@
-    <form method="post" asp-page-handler="Identificar" class="form-codigo">
-      <label for="codigo">Nº de empleado</label>
-      <input id="codigo" name="codigo" value="@Model.CodigoTecleado" inputmode="numeric" maxlength="8"
-             autocomplete="off" autofocus required />
-      <button type="submit">Continuar</button>
+    @* PC común: el lector de códigos de barras teclea el nº de empleado y un Intro, que envía el formulario. *@
+    <form method="post" asp-page-handler="Leer" class="form-codigo form-lector" data-lector>
+      <svg class="icono-lector" viewBox="0 0 64 40" aria-hidden="true">
+        <path d="M4 4h3v32H4zM10 4h2v32h-2zM15 4h4v32h-4zM22 4h2v32h-2zM27 4h3v32h-3zM33 4h2v32h-2zM38 4h4v32h-4zM45 4h2v32h-2zM50 4h3v32h-3zM56 4h4v32h-4z" />
+      </svg>
+      <label for="codigo">Pase su tarjeta por el lector</label>
+      <p class="detalle">o teclee su nº de empleado y pulse Intro</p>
+      <input id="codigo" name="codigo" inputmode="numeric" maxlength="30" autocomplete="off" />
+      <button type="submit">Fichar</button>
+
+      @* Tablet: lectura con la cámara (wwwroot/js/camara.js). *@
+      <div class="camara" data-camara hidden>
+        <div id="lector"></div>
+        <select id="camaras" aria-label="Cámara" hidden></select>
+      </div>
+      <p class="alerta aviso" data-aviso-camara hidden></p>
+      <button type="button" class="secundario" id="btnCamara">📷 Usar la cámara</button>
     </form>
+    <script src="~/lib/html5-qrcode/html5-qrcode.min.js"></script>
+    <script src="~/js/camara.js" asp-append-version="true"></script>
   }
-  else
+  else if (Model.Empleado is not null)
   {
     <div class="empleado">
       <div class="codigo">@Model.Empleado.MP_CODI</div>
       <div class="nombre">@Model.Empleado.Descripcion</div>
     </div>
 
-    <form method="post" asp-page-handler="Fichar" class="form-fichar"
-          data-volver="@Model.SegundosInactividad">
-      <input type="hidden" name="codigo" value="@Model.Empleado.MP_CODI" />
+    <form method="post" asp-page-handler="Fichar" class="form-fichar">
       <button type="submit" class="boton-fichar @(Model.TocaEntrada ? "entrada" : "salida")" autofocus>
         @(Model.TocaEntrada ? "ENTRADA" : "SALIDA")
       </button>
     </form>
-
-    @if (Model.Terminal.Tipo == TipoTerminal.PcComun)
-    {
-      <a asp-page="/Index" class="boton secundario otro-empleado">Otro nº de empleado</a>
-    }
 
     <h2>Marcajes de hoy</h2>
     @if (Model.Marcajes.Count == 0)

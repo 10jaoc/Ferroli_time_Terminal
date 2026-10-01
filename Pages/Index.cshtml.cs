@@ -8,8 +8,9 @@ namespace FerroliTime.Terminal.Pages;
 /// <summary>
 /// Pantalla única del terminal (terminal.asp):
 /// 1. Se comprueba la IP (PC común o terminal personal) y que la oficina esté abierta.
-/// 2. PC común: se teclea el nº de empleado. Terminal personal: el empleado es el de la IP.
-/// 3. Se muestra ENTRADA o SALIDA según su último marcaje de hoy y los marcajes del día.
+/// 2. PC común: se lee la tarjeta del empleado con el lector de códigos de barras (o se teclea el
+///    número y se pulsa Intro) y se ficha en el acto; el resultado se ve unos segundos en una ventana.
+/// 3. Terminal personal: el empleado es el de la IP; pulsa ENTRADA o SALIDA y ve sus marcajes del día.
 /// </summary>
 public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptionsMonitor<TerminalOptions> opciones) : PageModel
 {
@@ -19,9 +20,8 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
     public List<MarcajeDia> Marcajes { get; private set; } = [];
     public bool TocaEntrada { get; private set; } = true;
     public string? Error { get; private set; }
-    public string? CodigoTecleado { get; private set; }
     public DateTime Ahora { get; } = DateTime.Now;
-    public int SegundosInactividad => opciones.CurrentValue.SegundosInactividad;
+    public int SegundosMensaje => opciones.CurrentValue.SegundosMensaje;
 
     public bool Abierto => Terminal.Tipo != TipoTerminal.NoAutorizado && MotivoCerrado == null;
 
@@ -32,34 +32,53 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
         return Page();
     }
 
-    /// <summary>PC común: el empleado teclea su número.</summary>
-    public async Task<IActionResult> OnPostIdentificarAsync(string? codigo)
+    /// <summary>PC común: lectura de la tarjeta (o nº tecleado + Intro). Ficha sin más pasos.</summary>
+    public async Task<IActionResult> OnPostLeerAsync(string? codigo)
     {
         if (!await PrepararAsync()) return Pagina();
-        if (Terminal.Tipo == TipoTerminal.Personal) return RedirectToPage();
+        if (Terminal.Tipo != TipoTerminal.PcComun) return RedirectToPage();
 
-        await CargarEmpleadoAsync(codigo);
-        return Page();
+        if (await CargarEmpleadoAsync(codigo)) await RegistrarAsync();
+        else Resultado("error", "No se ha registrado", Error!);
+        return RedirectToPage();
     }
 
-    public async Task<IActionResult> OnPostFicharAsync(string? codigo)
+    /// <summary>Terminal personal: botón ENTRADA / SALIDA.</summary>
+    public async Task<IActionResult> OnPostFicharAsync()
     {
         if (!await PrepararAsync()) return Pagina();
+        if (Terminal.Tipo != TipoTerminal.Personal) return RedirectToPage();
 
         // En un terminal personal manda la IP, no lo que venga en el formulario.
-        if (!await CargarEmpleadoAsync(Terminal.Tipo == TipoTerminal.Personal ? Terminal.Empleado! : codigo))
-            return Page();
+        if (!await CargarEmpleadoAsync(Terminal.Empleado!)) return Page();
+        await RegistrarAsync();
+        return RedirectToPage();
+    }
 
+    /// <summary>Graba el marcaje del empleado cargado y deja el resultado para la siguiente pantalla.</summary>
+    private async Task RegistrarAsync()
+    {
         var ahora = DateTime.Now;
         var cfg = opciones.CurrentValue;
         var grabado = await repo.FicharAsync(Empleado!.MP_CODI, TocaEntrada, ahora, cfg.MinutosEntreMarcajes,
             Terminal.Ip, cfg.LocalizacionDe(Terminal.Ip));
 
-        TempData["Mensaje"] = grabado
-            ? $"{(TocaEntrada ? "ENTRADA" : "SALIDA")} registrada a las {ahora:HH:mm:ss} · {Empleado.Descripcion?.Trim()}"
-            : $"Ya tiene un marcaje en los últimos {cfg.MinutosEntreMarcajes} minutos: no se ha registrado otro.";
-        TempData["MensajeOk"] = grabado;
-        return RedirectToPage();
+        var quien = $"{Empleado.Descripcion?.Trim()} ({Empleado.MP_CODI})";
+        if (grabado)
+            Resultado(TocaEntrada ? "entrada" : "salida",
+                $"{(TocaEntrada ? "ENTRADA" : "SALIDA")} registrada correctamente",
+                $"{quien} · {ahora:HH:mm:ss}");
+        else
+            Resultado("aviso", "No se ha registrado",
+                $"{quien} ya tiene un marcaje en los últimos {cfg.MinutosEntreMarcajes} minutos.");
+    }
+
+    /// <param name="tipo">entrada, salida, aviso o error (clase CSS de la ventana).</param>
+    private void Resultado(string tipo, string titulo, string texto)
+    {
+        TempData["ResultadoTipo"] = tipo;
+        TempData["ResultadoTitulo"] = titulo;
+        TempData["ResultadoTexto"] = texto;
     }
 
     /// <summary>Comprueba IP, día y horario. Devuelve false si no se puede fichar.</summary>
@@ -83,11 +102,11 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
 
     private async Task<bool> CargarEmpleadoAsync(string? codigo)
     {
-        codigo = codigo?.Trim() ?? "";
-        CodigoTecleado = codigo;
+        // El lector puede añadir espacios o caracteres de control alrededor del número.
+        codigo = new string((codigo ?? "").Where(c => !char.IsControl(c)).ToArray()).Trim();
         if (codigo == "")
         {
-            Error = "Teclee su número de empleado.";
+            Error = "Lea su tarjeta o teclee su número de empleado.";
             return false;
         }
         // Nº de empleado de 8 dígitos: los numéricos se completan con ceros a la izquierda.
@@ -96,7 +115,7 @@ public class IndexModel(AccesoTerminal acceso, TerminalRepository repo, IOptions
         Empleado = await repo.EmpleadoAsync(codigo, soloReloj99: Terminal.Tipo == TipoTerminal.PcComun);
         if (Empleado is null)
         {
-            Error = "Código de empleado no existe. Inténtelo de nuevo.";
+            Error = $"El código {codigo} no corresponde a ningún empleado. Inténtelo de nuevo.";
             return false;
         }
 

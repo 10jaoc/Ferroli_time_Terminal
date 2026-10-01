@@ -22,7 +22,7 @@ public class AjustesTerminal
     // Terminal
     public int MinutosEntreMarcajes { get; set; } = 5;
     public bool PermitirFinDeSemana { get; set; }
-    public int SegundosInactividad { get; set; } = 30;
+    public int SegundosMensaje { get; set; } = 15;
     public string LocalizacionDefecto { get; set; } = "";
     public List<Localizacion> Localizaciones { get; set; } = [];
     /// <summary>Solo se edita en Development (en producción se ignora y se conserva).</summary>
@@ -53,7 +53,7 @@ public class ConfiguracionService(IConfiguration config, IWebHostEnvironment env
             Nombre = config["App:Nombre"] ?? "",
             MinutosEntreMarcajes = t.MinutosEntreMarcajes,
             PermitirFinDeSemana = t.PermitirFinDeSemana,
-            SegundosInactividad = t.SegundosInactividad,
+            SegundosMensaje = t.SegundosMensaje,
             LocalizacionDefecto = t.LocalizacionDefecto,
             Localizaciones = t.Localizaciones,
             IpSimulada = t.IpSimulada,
@@ -105,7 +105,8 @@ public class ConfiguracionService(IConfiguration config, IWebHostEnvironment env
             var t = Seccion(raiz, "Terminal");
             t["MinutosEntreMarcajes"] = a.MinutosEntreMarcajes;
             t["PermitirFinDeSemana"] = a.PermitirFinDeSemana;
-            t["SegundosInactividad"] = a.SegundosInactividad;
+            t["SegundosMensaje"] = a.SegundosMensaje;
+            t.Remove("SegundosInactividad"); // ya no se usa (el PC común ficha al leer la tarjeta)
             t["LocalizacionDefecto"] = a.LocalizacionDefecto.Trim();
             var lista = new JsonArray();
             foreach (var l in a.Localizaciones)

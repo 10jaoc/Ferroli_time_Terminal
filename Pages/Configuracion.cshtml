@@ -75,8 +75,8 @@
           <input id="minutos" asp-for="Datos.MinutosEntreMarcajes" type="number" min="0" max="120" />
         </div>
         <div>
-          <label for="segundos">Segundos de inactividad <small>(PC común)</small></label>
-          <input id="segundos" asp-for="Datos.SegundosInactividad" type="number" min="5" max="600" />
+          <label for="segundos">Segundos del mensaje <small>(PC común, tras fichar)</small></label>
+          <input id="segundos" asp-for="Datos.SegundosMensaje" type="number" min="3" max="120" />
         </div>
       </div>
       <label class="check"><input type="checkbox" asp-for="Datos.PermitirFinDeSemana" /> Permitir fichar sábados y domingos</label>
