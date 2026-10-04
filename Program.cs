@@ -20,8 +20,9 @@ builder.Services.AddScoped<ConfiguracionService>();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-    app.UseExceptionHandler("/Error");
+// También en desarrollo: la página de error muestra el aviso (p. ej. sin conexión con la base de datos)
+// y, solo en desarrollo, debajo el detalle técnico de la excepción.
+app.UseExceptionHandler("/Error");
 
 app.UseStaticFiles();
 app.UseRouting();
