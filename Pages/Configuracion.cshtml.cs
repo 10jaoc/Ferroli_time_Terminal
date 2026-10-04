@@ -66,7 +66,7 @@ public class ConfiguracionModel(AccesoTerminal acceso, ConfiguracionService conf
 
         var error = await ConfiguracionService.ProbarConexionAsync(configuracion.CadenaConexion(Datos));
         if (error != null) Error = "Conexión fallida: " + error;
-        else Exito = "Conexión correcta con la base de datos (no se ha guardado nada).";
+        else Exito = "Conexión correcta con la base de datos (no se ha guardado nada; para guardar, vuelva a escribir las contraseñas y pulse Guardar).";
         return Pagina();
     }
 
