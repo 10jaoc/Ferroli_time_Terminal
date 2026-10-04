@@ -91,7 +91,9 @@ Diferencias con la ASP:
 - PC común: se ficha con la tarjeta (lector o cámara) en un solo paso; en la ASP se tecleaba el número y luego
   se pulsaba ENTRADA/SALIDA.
 
-## Configuración (`appsettings.json`)
+## Configuración (`appdata\appsettings.json`)
+
+Si hay un `appsettings.json` en la raíz del sitio, la aplicación lo mueve a `appdata` al arrancar.
 
 | Clave | Uso |
 |---|---|
@@ -104,19 +106,19 @@ Diferencias con la ASP:
 | `Terminal:Localizaciones` / `LocalizacionDefecto` | Texto de `DESC_LOCA` según el principio de la IP (se usa el primer prefijo que coincida). |
 | `Terminal:IpSimulada` | **Solo en Development**: fichar desde el PC de desarrollo como si fuera esa IP. En producción se ignora. |
 
-Una clave que falte toma el valor por defecto indicado. `appsettings.json` contiene contraseñas y no se sube a
-Git ni se copia al publicar; la plantilla es `appsettings.example.json`.
+Una clave que falte toma el valor por defecto indicado. `appdata\appsettings.json` contiene contraseñas y no se
+sube a Git ni se copia al publicar; la plantilla es `appsettings.example.json`.
 
 ### Página de configuración (rueda ⚙ de la cabecera)
 
-La rueda de la derecha de la cabecera abre `/Configuracion`, que edita `appsettings.json`: conexión a la base
+La rueda de la derecha de la cabecera abre `/Configuracion`, que edita `appdata\appsettings.json`: conexión a la base
 de datos, nombre, minutos entre marcajes, segundos del mensaje, fin de semana, selector de cámara y
 localizaciones. **Solo se ve y solo se puede entrar** desde la IP que es el terminal personal de un empleado
 **activo** con `telefonos_aut.config = 1` (se marca en el backoffice: Terminales/Empleados → «¿Acceso a la
 configuración del terminal?»). Desde cualquier otro equipo devuelve 403.
 
 - Antes de guardar se prueba la conexión: una cadena que no funciona no se guarda.
-- Se deja copia en `appsettings.json.bak`, se escribe sin dejar el fichero a medias y se aplica sin reiniciar.
+- Se deja copia en `appdata\appsettings.json.bak`, se escribe sin dejar el fichero a medias y se aplica sin reiniciar.
 - La contraseña de la base de datos nunca se muestra; en blanco = no cambiarla.
 - Cada cambio queda en el log con el empleado y la IP.
 - La única protección es la IP: marcar `config = 1` solo en equipos de confianza.
@@ -138,10 +140,11 @@ dotnet run          # http://localhost:5081
 
 `Publicar.cmd` genera `bin\publish` (el servidor necesita el ASP.NET Core 8 Hosting Bundle). Copiar el
 contenido sobre la carpeta del sitio con el sitio parado (o con `app_offline.htm`), conservando su
-`appsettings.json`. En el backoffice, **Configuración → URL del terminal** activa el menú «Emular terminal».
+carpeta `appdata` (el zip no la lleva). En el backoffice, **Configuración → URL del terminal** activa el menú
+«Emular terminal».
 
-- La cuenta del grupo de aplicaciones de IIS necesita **permiso de escritura** en la carpeta del sitio para que
-  la página de configuración pueda guardar `appsettings.json`.
+- La cuenta del grupo de aplicaciones de IIS necesita **permiso de lectura y escritura** en la carpeta `appdata` del
+  sitio para que la página de configuración pueda guardar `appdata\appsettings.json`.
 - **Tablets**: el sitio debe ir por **https** (cámara) y la IP de la tablet tiene que estar en un parámetro
   activo 500–599; con WiFi/DHCP conviene reservarle la IP.
 - Si el sitio se publica detrás de un proxy o balanceador, la IP que llega es la del proxy: habría que
