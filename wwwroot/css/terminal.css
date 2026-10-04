@@ -140,6 +140,8 @@ button:hover, .boton:hover { opacity: .9; }
 .resultado-fichaje.aviso .caja { border-top-color: #d8b400; }
 .resultado-fichaje.aviso .titulo { color: #5c4b00; }
 .resultado-fichaje.error .caja { border-top-color: var(--error); }
+.resultado-fichaje.exito .caja { border-top-color: var(--exito); }
+.resultado-fichaje.exito .titulo { color: var(--exito); }
 .resultado-fichaje.error .titulo { color: var(--error); }
 
 table { width: 100%; border-collapse: collapse; margin: .5rem 0; }

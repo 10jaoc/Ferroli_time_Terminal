@@ -56,8 +56,11 @@ public class ConfiguracionModel(AccesoTerminal acceso, ConfiguracionService conf
             return Pagina();
         }
 
-        TempData["Exito"] = "Configuración guardada y aplicada. Se ha dejado copia de la anterior en appsettings.json.bak.";
-        return RedirectToPage();
+        // Vuelve a la pantalla de fichaje con la ventana de resultado (se cierra sola, como la de un fichaje).
+        TempData["ResultadoTipo"] = "exito";
+        TempData["ResultadoTitulo"] = "Configuración guardada";
+        TempData["ResultadoTexto"] = "Configuración guardada y aplicada. Se ha dejado copia de la anterior en appsettings.json.bak.";
+        return RedirectToPage("/Index");
     }
 
     public async Task<IActionResult> OnPostProbarBdAsync()
