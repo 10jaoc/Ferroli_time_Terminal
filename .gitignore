@@ -5,3 +5,6 @@ obj/
 
 # Configuración con contraseñas (plantilla: appsettings.example.json)
 appsettings.json
+appsettings.json.bak
+appsettings.json.tmp
+appsettings.Development.json
