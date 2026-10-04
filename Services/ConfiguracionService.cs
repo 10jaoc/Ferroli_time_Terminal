@@ -32,13 +32,32 @@ public class AjustesTerminal
 }
 
 /// <summary>
-/// Lee y guarda appsettings.json. Antes de escribir deja una copia en appsettings.json.bak y
+/// Lee y guarda appdata\appsettings.json. Antes de escribir deja una copia en appdata\appsettings.json.bak y
 /// después recarga la configuración, de modo que los cambios se aplican sin reiniciar.
 /// </summary>
 public class ConfiguracionService(IConfiguration config, IWebHostEnvironment env, ILogger<ConfiguracionService> log)
 {
     private static readonly SemaphoreSlim Bloqueo = new(1, 1);
-    private string Ruta => Path.Combine(env.ContentRootPath, "appsettings.json");
+    private string Ruta => Path.Combine(env.ContentRootPath, RutaRelativa);
+
+    /// <summary>Carpeta de la configuración editable, relativa a la raíz del sitio (no va en el zip).</summary>
+    public const string Carpeta = "appdata";
+    public static readonly string RutaRelativa = Path.Combine(Carpeta, "appsettings.json");
+
+    /// <summary>
+    /// Crea appdata y, si appsettings.json aún está en la raíz del sitio (instalaciones anteriores), lo mueve allí
+    /// junto con su .bak. Se llama al arrancar, antes de leer la configuración.
+    /// </summary>
+    public static void PrepararCarpeta(string raiz)
+    {
+        Directory.CreateDirectory(Path.Combine(raiz, Carpeta));
+        foreach (var nombre in new[] { "appsettings.json", "appsettings.json.bak" })
+        {
+            var antigua = Path.Combine(raiz, nombre);
+            var nueva = Path.Combine(raiz, Carpeta, nombre);
+            if (File.Exists(antigua) && !File.Exists(nueva)) File.Move(antigua, nueva);
+        }
+    }
 
     public AjustesTerminal Leer()
     {

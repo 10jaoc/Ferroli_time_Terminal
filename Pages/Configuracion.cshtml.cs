@@ -52,14 +52,14 @@ public class ConfiguracionModel(AccesoTerminal acceso, ConfiguracionService conf
         }
         catch (Exception ex)
         {
-            Error = "No se ha podido escribir appsettings.json: " + ex.Message;
+            Error = "No se ha podido escribir appdata\\appsettings.json: " + ex.Message;
             return Pagina();
         }
 
         // Vuelve a la pantalla de fichaje con la ventana de resultado (se cierra sola, como la de un fichaje).
         TempData["ResultadoTipo"] = "exito";
         TempData["ResultadoTitulo"] = "Configuración guardada";
-        TempData["ResultadoTexto"] = "Configuración guardada y aplicada. Se ha dejado copia de la anterior en appsettings.json.bak.";
+        TempData["ResultadoTexto"] = "Configuración guardada y aplicada. Se ha dejado copia de la anterior en appdata\\appsettings.json.bak.";
         return RedirectToPage("/Index");
     }
 

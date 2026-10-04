@@ -14,6 +14,8 @@
     <!-- La plantilla de configuración es para el repositorio, no para el servidor. -->
     <Content Update="appsettings.example.json" CopyToPublishDirectory="Never" />
     <!-- El appsettings.json del servidor (contraseñas de producción) no se sobrescribe al publicar. -->
+    <!-- appdata\ (appsettings.json que edita Configuración) tampoco: se conserva la del servidor. -->
+    <Content Update="appdata\**" CopyToPublishDirectory="Never" />
     <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 </Project>

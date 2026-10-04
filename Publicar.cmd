@@ -2,7 +2,8 @@
 rem ---------------------------------------------------------------------------------------------
 rem  Publica Ferroli_time_Terminal en bin\publish para desplegar en IIS.
 rem  Requiere en el servidor el "ASP.NET Core 8 Hosting Bundle" (el mismo que usa carta-portes-cs).
-rem  Copiar la carpeta COMPLETA al sitio de IIS (conservando el appsettings.json del servidor).
+rem  Copiar la carpeta COMPLETA al sitio de IIS (conservando la carpeta appdata del servidor, con su
+rem  appsettings.json; el grupo de aplicaciones de IIS necesita escritura sobre appdata).
 rem ---------------------------------------------------------------------------------------------
 setlocal
 cd /d "%~dp0"

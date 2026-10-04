@@ -1,4 +1,5 @@
 using FerroliTime.Terminal.Services;
+using Microsoft.Extensions.Configuration.Json;
 
 // Terminal de marcajes de Ferroli Time (sustituye a terminal.asp de DISCOD\ASP\F_TIMER).
 // No hay login: solo pueden fichar los equipos cuya IP está en telefonos_aut (terminal
@@ -6,12 +7,32 @@ using FerroliTime.Terminal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// appsettings.json vive en la carpeta appdata: al desplegar (copiar el zip) no se toca y en IIS basta con dar
+// escritura sobre esa carpeta. Se sustituye la fuente de la raíz en su mismo sitio, de modo que
+// appsettings.{Entorno}.json y las variables de entorno siguen teniendo prioridad.
+ConfiguracionService.PrepararCarpeta(builder.Environment.ContentRootPath);
+var fuentes = builder.Configuration.Sources;
+for (var i = 0; i < fuentes.Count; i++)
+{
+    if (fuentes[i] is JsonConfigurationSource { Path: "appsettings.json" } raiz)
+    {
+        fuentes[i] = new JsonConfigurationSource
+        {
+            FileProvider = raiz.FileProvider,
+            Path = ConfiguracionService.RutaRelativa,
+            Optional = true,
+            ReloadOnChange = true,
+        };
+        break;
+    }
+}
+
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<TerminalOptions>(builder.Configuration.GetSection("Terminal"));
 
 if (string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("SqlServer")))
-    throw new InvalidOperationException("Falta la cadena de conexión 'SqlServer' en appsettings.json.");
+    throw new InvalidOperationException("Falta la cadena de conexión 'SqlServer' en appdata\\appsettings.json.");
 
 builder.Services.AddScoped(sp =>
     new TerminalRepository(sp.GetRequiredService<IConfiguration>().GetConnectionString("SqlServer")!));

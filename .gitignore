@@ -4,6 +4,7 @@ obj/
 *.user
 
 # Configuración con contraseñas (plantilla: appsettings.example.json)
+appdata/
 appsettings.json
 appsettings.json.bak
 appsettings.json.tmp
